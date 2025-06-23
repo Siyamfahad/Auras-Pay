@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                  String   @id @default(uuid())
+  email               String   @unique
+  passwordHash        String   @map("password_hash")
+  walletAddress       String?  @map("wallet_address")
+  apiKey              String   @unique @default(uuid()) @map("api_key")
+  transactionCredits  Int      @default(5) @map("transaction_credits")
+  status              String   @default("ACTIVE")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  payments            Payment[]
+  transactions        Transaction[]
+
+  @@map("users")
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  userId                String        @map("user_id")
+  amount                Float
+  currency              String        @default("SOL")
+  label                 String
+  message               String
+  solanaPayUrl          String        @map("solana_pay_url")
+  qrCodeData            String?       @map("qr_code_data")
+  reference             String?       @unique
+  transactionSignature  String?       @map("transaction_signature")
+  verifiedAt            DateTime?     @map("verified_at")
+  webhookUrl            String?       @map("webhook_url")
+  createdViaApi         Boolean       @default(false) @map("created_via_api")
+  status                String        @default("PENDING")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Transaction {
+  id                String            @id @default(uuid())
+  userId            String            @map("user_id")
+  creditsAdded      Int               @map("credits_added")
+  amountPaid        Float             @map("amount_paid")
+  paymentMethod     String            @map("payment_method")
+  stripePaymentId   String?           @map("stripe_payment_id")
+  status            String            @default("PENDING")
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// Note: SQLite doesn't support enums, so we use strings with validation in the application layer
+// Valid values:
+// UserStatus: "ACTIVE", "INACTIVE", "SUSPENDED"
+// PaymentStatus: "PENDING", "COMPLETED", "EXPIRED", "FAILED"
+// PaymentMethod: "STRIPE", "PAYPAL", "CRYPTO"
+// TransactionStatus: "PENDING", "COMPLETED", "FAILED", "REFUNDED" 
