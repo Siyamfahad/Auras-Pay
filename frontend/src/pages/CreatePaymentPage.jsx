@@ -83,28 +83,28 @@ export default function CreatePaymentPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Create Payment Link</h1>
-            <p className="text-gray-600 mt-2">Generate Solana Pay links with QR codes for your customers</p>
+            <h1 className="text-3xl font-bold text-white">Create Payment Link</h1>
+            <p className="text-gray-400 mt-2">Generate Solana Pay links with QR codes for your customers</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Available Credits</p>
-            <p className="text-2xl font-bold text-blue-600">{user?.transactionCredits || 0}</p>
+            <p className="text-sm text-gray-400">Available Credits</p>
+            <p className="text-2xl font-bold text-accent-primary">{user?.transactionCredits || 0}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Payment Form */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="card">
             <div className="flex items-center space-x-3 mb-6">
-              <CreditCard className="h-6 w-6 text-blue-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Payment Details</h2>
+              <CreditCard className="h-6 w-6 text-accent-primary" />
+              <h2 className="text-xl font-semibold text-white">Payment Details</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Amount and Currency */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Amount *
                   </label>
                   <input
@@ -115,19 +115,19 @@ export default function CreatePaymentPage() {
                     step="0.000000001"
                     min="0"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input"
                     placeholder="0.1"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Currency *
                   </label>
                   <select
                     name="currency"
                     value={formData.currency}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="input"
                   >
                     {supportedTokens.map(token => (
                       <option key={token.symbol} value={token.symbol}>
@@ -140,7 +140,7 @@ export default function CreatePaymentPage() {
 
               {/* Label */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Label *
                 </label>
                 <input
@@ -150,15 +150,15 @@ export default function CreatePaymentPage() {
                   onChange={handleInputChange}
                   maxLength="100"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="input"
                   placeholder="Coffee Purchase"
                 />
-                <p className="text-xs text-gray-500 mt-1">This appears in the customer's wallet</p>
+                <p className="text-xs text-gray-400 mt-1">This appears in the customer's wallet</p>
               </div>
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Message
                 </label>
                 <textarea
@@ -167,14 +167,14 @@ export default function CreatePaymentPage() {
                   onChange={handleInputChange}
                   maxLength="200"
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="input"
                   placeholder="Optional message for the customer"
                 />
               </div>
 
               {/* Wallet Address */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Recipient Wallet Address
                 </label>
                 <input
@@ -182,17 +182,17 @@ export default function CreatePaymentPage() {
                   name="walletAddress"
                   value={formData.walletAddress}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="input"
                   placeholder="Uses your default wallet address if empty"
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave empty to use your default wallet</p>
+                <p className="text-xs text-gray-400 mt-1">Leave empty to use your default wallet</p>
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading || !user || user.transactionCredits < 1}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full btn-primary"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">

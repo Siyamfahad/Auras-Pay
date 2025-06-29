@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useEffect } from 'react';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -12,7 +13,6 @@ import PaymentsPage from './pages/PaymentsPage';
 import CreatePaymentPage from './pages/CreatePaymentPage';
 import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
-import LandingPage from './pages/LandingPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,6 +24,22 @@ const queryClient = new QueryClient({
   },
 });
 
+// Landing page redirect component
+const LandingPageRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/index.html');
+  }, []);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading landing page...</p>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -32,7 +48,7 @@ function App() {
           <div className="min-h-screen bg-gray-50">
             <Routes>
               {/* Public routes */}
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<LandingPageRedirect />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               

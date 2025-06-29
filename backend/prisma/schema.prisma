@@ -17,6 +17,7 @@ model User {
   walletAddress       String?  @map("wallet_address")
   apiKey              String   @unique @default(uuid()) @map("api_key")
   transactionCredits  Int      @default(5) @map("transaction_credits")
+  isAdmin             Boolean  @default(false) @map("is_admin")
   status              String   @default("ACTIVE")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")

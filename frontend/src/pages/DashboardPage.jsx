@@ -11,7 +11,9 @@ import {
   ArrowRight,
   Eye,
   DollarSign,
-  Activity
+  Activity,
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -28,10 +30,10 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const statusColors = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    EXPIRED: 'bg-gray-100 text-gray-800',
-    FAILED: 'bg-red-100 text-red-800'
+    PENDING: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+    COMPLETED: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+    EXPIRED: 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
+    FAILED: 'bg-red-500/10 text-red-400 border border-red-500/20'
   };
 
   useEffect(() => {
@@ -77,153 +79,174 @@ export default function DashboardPage() {
     });
   };
 
-  const StatCard = ({ title, value, icon: Icon, color, description }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center">
-        <div className={`flex-shrink-0 p-3 rounded-lg ${color}`}>
-          <Icon className="h-6 w-6 text-white" />
+  const StatCard = ({ title, value, icon: Icon, trend, description }) => (
+    <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition-colors">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-gray-800 rounded-md">
+            <Icon className="h-5 w-5 text-gray-400" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-400">{title}</p>
+            <p className="text-2xl font-semibold text-white mt-1">{value}</p>
+          </div>
         </div>
-        <div className="ml-4 flex-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          {description && (
-            <p className="text-sm text-gray-500 mt-1">{description}</p>
-          )}
-        </div>
+        {trend && (
+          <div className="text-right">
+            <p className="text-xs text-gray-500">{description}</p>
+          </div>
+        )}
       </div>
     </div>
   );
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Welcome Header */}
+      <div className="space-y-8">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {user?.email?.split('@')[0] || 'User'}! 👋
-            </h1>
-            <p className="text-gray-600 mt-2">Here's what's happening with your payments today.</p>
+            <h1 className="text-3xl font-semibold text-white">Dashboard</h1>
+            <p className="text-gray-400 mt-1">Welcome back, {user?.email?.split('@')[0] || 'User'}</p>
           </div>
           <Link
             to="/create-payment"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="bg-white text-black px-6 py-2.5 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center space-x-2"
           >
             <Plus className="h-4 w-4" />
             <span>Create Payment</span>
           </Link>
         </div>
 
+        {/* Wallet Setup Alert */}
+        {!user?.walletAddress && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-amber-400">Wallet Setup Required</h3>
+                <p className="text-sm text-amber-300/80 mt-1">
+                  Configure your Solana wallet address to start receiving payments.
+                </p>
+                  <Link
+                    to="/settings"
+                  className="inline-flex items-center text-sm font-medium text-amber-400 hover:text-amber-300 mt-2"
+                  >
+                    Set up wallet
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                  </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Credits Card */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 text-white">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold mb-2">Available Credits</h2>
-              <p className="text-3xl font-bold">{user?.transactionCredits || 0}</p>
-              <p className="text-blue-100 mt-1">Each credit creates one payment link</p>
+              <h2 className="text-lg font-medium text-white">Available Credits</h2>
+              <div className="flex items-baseline space-x-2 mt-2">
+                <span className="text-3xl font-semibold text-white">{user?.transactionCredits || 0}</span>
+                <span className="text-sm text-gray-400">credits remaining</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Each credit creates one payment link</p>
             </div>
-            <div className="text-right">
-              <CreditCard className="h-12 w-12 text-blue-200 mb-2" />
+            <div className="flex items-center space-x-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs text-gray-500">Usage this month</p>
+                <p className="text-sm text-gray-400">— credits</p>
+              </div>
               {(user?.transactionCredits || 0) < 5 && (
                 <Link
                   to="/settings"
-                  className="inline-flex items-center px-3 py-2 bg-white bg-opacity-20 rounded-lg text-sm font-medium hover:bg-opacity-30 transition-colors"
+                  className="bg-gray-800 text-gray-300 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors"
                 >
-                  Buy More Credits
-                  <ArrowRight className="h-4 w-4 ml-1" />
+                  Buy Credits
                 </Link>
               )}
             </div>
           </div>
         </div>
 
-        {/* Statistics Cards */}
+        {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Payments"
             value={stats.totalPayments}
-            icon={Activity}
-            color="bg-blue-500"
-            description="All payment links created"
+            icon={BarChart3}
+            description="All time"
           />
           <StatCard
             title="Completed"
             value={stats.completedPayments}
             icon={CheckCircle}
-            color="bg-green-500"
             description="Successfully paid"
           />
           <StatCard
             title="Pending"
             value={stats.pendingPayments}
             icon={Clock}
-            color="bg-yellow-500"
             description="Awaiting payment"
           />
           <StatCard
             title="Total Received"
             value={`${stats.totalAmount.toFixed(3)} SOL`}
             icon={DollarSign}
-            color="bg-purple-500"
-            description="From completed payments"
+            description="Total earnings"
           />
         </div>
 
-        {/* Recent Payments and Quick Actions */}
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Payments */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-200">
+            <div className="bg-gray-900 border border-gray-800 rounded-lg">
+              <div className="px-6 py-4 border-b border-gray-800">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Payments</h3>
+                  <h3 className="text-lg font-medium text-white">Recent Payments</h3>
                   <Link
                     to="/payments"
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+                    className="text-sm text-gray-400 hover:text-white flex items-center space-x-1"
                   >
-                    View All
-                    <ArrowRight className="h-4 w-4 ml-1" />
+                    <span>View all</span>
+                    <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
               </div>
 
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-gray-800">
                 {isLoading ? (
-                  <div className="p-6 text-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-gray-600 mt-2">Loading payments...</p>
+                  <div className="px-6 py-12 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
+                    <p className="text-gray-400 mt-2 text-sm">Loading payments...</p>
                   </div>
                 ) : recentPayments.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <Eye className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">No payments yet</p>
+                  <div className="px-6 py-12 text-center">
+                    <Eye className="h-8 w-8 text-gray-600 mx-auto mb-3" />
+                    <p className="text-gray-400 mb-4">No payments yet</p>
                     <Link
                       to="/create-payment"
-                      className="mt-2 inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="inline-flex items-center text-sm text-white bg-gray-800 px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
                     >
-                      Create your first payment link
-                      <ArrowRight className="h-4 w-4 ml-1" />
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create your first payment
                     </Link>
                   </div>
                 ) : (
                   recentPayments.map((payment) => (
-                    <div key={payment.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div key={payment.id} className="px-6 py-4 hover:bg-gray-800/50 transition-colors">
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">{payment.label}</p>
-                              <p className="text-sm text-gray-500">{payment.message || 'No message'}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{payment.label}</p>
+                          <p className="text-xs text-gray-500 mt-1">{payment.message || 'No description'}</p>
                             </div>
+                        <div className="flex items-center space-x-4 ml-4">
                             <div className="text-right">
-                              <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium text-white">
                                 {payment.amount} {payment.currency}
                               </p>
                               <p className="text-xs text-gray-500">{formatDate(payment.createdAt)}</p>
-                            </div>
                           </div>
-                        </div>
-                        <div className="ml-4">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[payment.status]}`}>
                             {payment.status}
                           </span>
@@ -238,51 +261,51 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+              <h3 className="text-lg font-medium text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
                   to="/create-payment"
-                  className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+                  className="flex items-center justify-between p-3 border border-gray-800 rounded-md hover:border-gray-700 hover:bg-gray-800/50 transition-all group"
                 >
                   <div className="flex items-center space-x-3">
-                    <Plus className="h-5 w-5 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-900">Create Payment Link</span>
+                    <Plus className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm font-medium text-white">Create Payment</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                  <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400" />
                 </Link>
 
                 <Link
                   to="/payments"
-                  className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+                  className="flex items-center justify-between p-3 border border-gray-800 rounded-md hover:border-gray-700 hover:bg-gray-800/50 transition-all group"
                 >
                   <div className="flex items-center space-x-3">
-                    <Eye className="h-5 w-5 text-green-600" />
-                    <span className="text-sm font-medium text-gray-900">View All Payments</span>
+                    <TrendingUp className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm font-medium text-white">View Payments</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                  <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400" />
                 </Link>
 
                 <Link
                   to="/settings"
-                  className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+                  className="flex items-center justify-between p-3 border border-gray-800 rounded-md hover:border-gray-700 hover:bg-gray-800/50 transition-all group"
                 >
                   <div className="flex items-center space-x-3">
-                    <CreditCard className="h-5 w-5 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-900">Buy Credits</span>
+                    <CreditCard className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm font-medium text-white">Settings</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                  <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400" />
                 </Link>
               </div>
             </div>
 
-            {/* Tips Card */}
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border border-green-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">💡 Pro Tips</h3>
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>• Share payment links via QR codes for easy mobile payments</p>
-                <p>• Set clear labels to help customers understand what they're paying for</p>
+            {/* Tips */}
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+              <h3 className="text-lg font-medium text-white mb-3">Tips</h3>
+              <div className="space-y-3 text-sm text-gray-400">
+                <p>• Use clear payment descriptions to help customers understand charges</p>
                 <p>• Monitor payment status in real-time from the Payments page</p>
+                <p>• Set up your wallet address to start receiving payments</p>
               </div>
             </div>
           </div>

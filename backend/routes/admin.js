@@ -8,8 +8,8 @@ const prisma = new PrismaClient();
 
 // Middleware to check if user is admin
 const requireAdmin = (req, res, next) => {
-  // Simple admin check - you can implement proper role-based access
-  if (!req.user || (!req.user.email.includes('admin') && req.user.id !== 1)) {
+  // Check if user has isAdmin flag set to true, or fallback to legacy checks
+  if (!req.user || (!req.user.isAdmin && !req.user.email?.includes('admin') && req.user.id !== 1)) {
     return res.status(403).json({
       success: false,
       error: 'Admin access required'
@@ -27,9 +27,18 @@ router.get('/users', authenticate, requireAdmin, async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = search ? {
-      email: {
-        contains: search
-      }
+      OR: [
+        {
+          email: {
+            contains: search
+          }
+        },
+        {
+          walletAddress: {
+            contains: search
+          }
+        }
+      ]
     } : {};
 
     const [users, total] = await Promise.all([
@@ -40,6 +49,8 @@ router.get('/users', authenticate, requireAdmin, async (req, res) => {
           email: true,
           walletAddress: true,
           transactionCredits: true,
+          isAdmin: true,
+          status: true,
           createdAt: true
         },
         orderBy: { createdAt: 'desc' },
@@ -114,8 +125,8 @@ router.post('/adjust-credits', authenticate, requireAdmin, async (req, res) => {
 
     // Get current user
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(userId) },
-      select: { id: true, email: true, transactionCredits: true }
+      where: { id: userId },
+      select: { id: true, email: true, transactionCredits: true, isAdmin: true }
     });
 
     if (!user) {
@@ -125,12 +136,20 @@ router.post('/adjust-credits', authenticate, requireAdmin, async (req, res) => {
       });
     }
 
+    // Prevent adjusting admin user credits
+    if (user.isAdmin) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot adjust admin user credits'
+      });
+    }
+
     // Calculate new credit balance (ensure it doesn't go below 0)
     const newBalance = Math.max(0, user.transactionCredits + adjustmentValue);
 
     // Update user credits
     const updatedUser = await prisma.user.update({
-      where: { id: parseInt(userId) },
+      where: { id: userId },
       data: { transactionCredits: newBalance },
       select: {
         id: true,
@@ -169,30 +188,68 @@ router.get('/analytics', authenticate, requireAdmin, async (req, res) => {
   try {
     const [
       totalUsers,
+      totalAdmins,
       totalPayments,
-      totalCreditsIssued
+      totalCreditsIssued,
+      pendingPayments,
+      completedPayments
     ] = await Promise.all([
-      prisma.user.count(),
+      prisma.user.count({ where: { isAdmin: false } }),
+      prisma.user.count({ where: { isAdmin: true } }),
       prisma.payment.count(),
       prisma.user.aggregate({
         _sum: {
           transactionCredits: true
-        }
-      })
+        },
+        where: { isAdmin: false }
+      }),
+      prisma.payment.count({ where: { status: 'PENDING' } }),
+      prisma.payment.count({ where: { status: 'COMPLETED' } })
     ]);
 
     // Calculate total revenue from transactions
     const revenueData = await prisma.transaction.aggregate({
       _sum: {
         amountPaid: true
+      },
+      where: {
+        status: 'COMPLETED'
+      }
+    });
+
+    // Get recent activity (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentUsers = await prisma.user.count({
+      where: {
+        createdAt: {
+          gte: thirtyDaysAgo
+        },
+        isAdmin: false
+      }
+    });
+
+    const recentPayments = await prisma.payment.count({
+      where: {
+        createdAt: {
+          gte: thirtyDaysAgo
+        }
       }
     });
 
     const analytics = {
       totalUsers,
+      totalAdmins,
       totalPayments,
+      pendingPayments,
+      completedPayments,
       totalCreditsIssued: totalCreditsIssued._sum.transactionCredits || 0,
-      totalRevenue: revenueData._sum.amountPaid || 0
+      totalRevenue: revenueData._sum.amountPaid || 0,
+      recentActivity: {
+        newUsers: recentUsers,
+        newPayments: recentPayments
+      }
     };
 
     res.json({
@@ -214,56 +271,43 @@ router.get('/analytics', authenticate, requireAdmin, async (req, res) => {
 // @access  Admin only
 router.get('/recent-activity', authenticate, requireAdmin, async (req, res) => {
   try {
-    const [recentPayments, recentUsers, recentTransactions] = await Promise.all([
-      prisma.payment.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          amount: true,
-          currency: true,
-          status: true,
-          createdAt: true,
-          user: {
-            select: {
-              email: true
-            }
+    const { limit = 20 } = req.query;
+
+    // Get recent users
+    const recentUsers = await prisma.user.findMany({
+      where: { isAdmin: false },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: 'desc' },
+      take: parseInt(limit) / 2
+    });
+
+    // Get recent payments
+    const recentPayments = await prisma.payment.findMany({
+      select: {
+        id: true,
+        amount: true,
+        currency: true,
+        status: true,
+        createdAt: true,
+        user: {
+          select: {
+            email: true
           }
         }
-      }),
-      prisma.user.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          email: true,
-          createdAt: true,
-          transactionCredits: true
-        }
-      }),
-      prisma.transaction.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          creditsAdded: true,
-          amountPaid: true,
-          createdAt: true,
-          user: {
-            select: {
-              email: true
-            }
-          }
-        }
-      })
-    ]);
+      },
+      orderBy: { createdAt: 'desc' },
+      take: parseInt(limit) / 2
+    });
 
     res.json({
       success: true,
       data: {
-        recentPayments,
         recentUsers,
-        recentTransactions
+        recentPayments
       }
     });
 

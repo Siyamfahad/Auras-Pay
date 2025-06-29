@@ -7,48 +7,62 @@ const prisma = new PrismaClient();
 // JWT Authentication middleware
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const authHeader = req.header('Authorization');
+    const token = authHeader && authHeader.startsWith('Bearer ') 
+      ? authHeader.slice(7) 
+      : null;
+
     if (!token) {
       return res.status(401).json({
         success: false,
-        error: 'Access token is required'
+        error: 'Access denied. No token provided.'
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        id: true,
-        email: true,
-        walletAddress: true,
-        transactionCredits: true,
-        status: true
-      }
-    });
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Get user from database with admin flag
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          walletAddress: true,
+          transactionCredits: true,
+          isAdmin: true,
+          status: true,
+          createdAt: true
+        }
+      });
 
-    if (!user) {
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid token. User not found.'
+        });
+      }
+
+      if (user.status !== 'ACTIVE') {
+        return res.status(403).json({
+          success: false,
+          error: 'Account is not active.'
+        });
+      }
+
+      req.user = user;
+      next();
+    } catch (jwtError) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid token'
+        error: 'Invalid token.'
       });
     }
-
-    if (user.status !== 'ACTIVE') {
-      return res.status(403).json({
-        success: false,
-        error: 'Account is not active'
-      });
-    }
-
-    req.user = user;
-    next();
   } catch (error) {
     logger.error('Authentication error:', error);
-    return res.status(401).json({
+    res.status(500).json({
       success: false,
-      error: 'Invalid token'
+      error: 'Server error during authentication'
     });
   }
 };
@@ -56,8 +70,8 @@ const authenticate = async (req, res, next) => {
 // API Key Authentication middleware
 const authenticateApiKey = async (req, res, next) => {
   try {
-    const apiKey = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const apiKey = req.header('X-API-Key');
+
     if (!apiKey) {
       return res.status(401).json({
         success: false,
@@ -70,7 +84,6 @@ const authenticateApiKey = async (req, res, next) => {
       select: {
         id: true,
         email: true,
-        walletAddress: true,
         transactionCredits: true,
         status: true
       }
@@ -94,9 +107,9 @@ const authenticateApiKey = async (req, res, next) => {
     next();
   } catch (error) {
     logger.error('API key authentication error:', error);
-    return res.status(401).json({
+    res.status(500).json({
       success: false,
-      error: 'Invalid API key'
+      error: 'Server error during authentication'
     });
   }
 };

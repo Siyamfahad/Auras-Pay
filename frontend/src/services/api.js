@@ -41,8 +41,13 @@ export const authAPI = {
   login: (email, password) =>
     api.post('/api/auth/login', { email, password }),
   
-  register: (email, password, walletAddress) =>
-    api.post('/api/auth/register', { email, password, walletAddress }),
+  register: (email, password, walletAddress = null) => {
+    const data = { email, password };
+    if (walletAddress) {
+      data.walletAddress = walletAddress;
+    }
+    return api.post('/api/auth/register', data);
+  },
   
   getProfile: () =>
     api.get('/api/auth/me'),

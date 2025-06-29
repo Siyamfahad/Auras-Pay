@@ -116,7 +116,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (email, password, walletAddress) => {
+  const register = async (email, password, walletAddress = null) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await authAPI.register(email, password, walletAddress);

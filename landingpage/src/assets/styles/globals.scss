@@ -1,0 +1,85 @@
+// Initialize Tailwind CSS
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Import signature font
+@font-face {
+  font-family: LaBelleAurore;
+  src: url("/fonts/signature/LaBelleAurore.ttf");
+  font-display: swap;
+}
+
+.signature{
+  font-family: LaBelleAurore;
+}
+
+// CSS Reset
+* {
+  box-sizing: border-box;
+}
+
+// Base Styles
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  scroll-behavior:smooth;
+  color-scheme: dark;
+}
+
+// Base Background Color
+body{
+  color: white;
+  background: black;
+}
+
+// Force GPU Acceleration 
+nav, .nav{
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  will-change: transform; 
+}
+
+
+// Typography
+p{
+  @apply font-medium leading-relaxed tracking-wide text-gray-400 text-sm sm:text-base;
+}
+
+h2{
+  @apply text-lg sm:text-xl;
+}
+
+h3{
+  @apply text-lg sm:text-xl;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.inline-link{
+  @apply text-main-hover underline-offset-8 transition-all duration-300 hover:underline;
+}
+
+
+// Load Theme Colors
+.bg-main {
+  background: var(--main-color);
+}
+.bg-main-hover:hover {
+    background: var(--main-color-darker);
+}
+.text-main {
+  color: var(--main-color-lighter);
+}
+.button-text{
+  color: var(--main-text-color);
+}
+.text-main-hover:hover {
+  color: var(--main-color);
+}
