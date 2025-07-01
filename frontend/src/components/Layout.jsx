@@ -10,12 +10,14 @@ import {
   Menu,
   X,
   Sparkles,
+  Book,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Create Payment', href: '/create-payment', icon: Plus },
+  { name: 'API Docs', href: '/api-docs', icon: Book },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

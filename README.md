@@ -20,19 +20,19 @@ A comprehensive payment platform built with React, Node.js, and Solana blockchai
 2. **Run the automated setup script:**
    
    **For macOS/Linux:**
-   ```bash
+```bash
    chmod +x setup.sh
    ./setup.sh
-   ```
-   
+```
+
    **For Windows:**
    ```batch
    setup.bat
    ```
 
    Or manually install dependencies:
-   ```bash
-   npm install
+```bash
+npm install
    npm run install:all
    ```
 

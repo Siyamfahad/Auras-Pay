@@ -26,6 +26,12 @@ frontend/.env
 landingpage/.env
 walletPage/.env
 
+# Auto-generated port files
+backend/.current-port
+frontend/.current-port
+landingpage/.current-port
+walletPage/.current-port
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

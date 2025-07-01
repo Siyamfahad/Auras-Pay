@@ -13,6 +13,7 @@ import PaymentsPage from './pages/PaymentsPage';
 import CreatePaymentPage from './pages/CreatePaymentPage';
 import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
+import ApiDocsPage from './pages/ApiDocsPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -76,6 +77,11 @@ function App() {
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/api-docs" element={
+                <ProtectedRoute>
+                  <ApiDocsPage />
                 </ProtectedRoute>
               } />
               

@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const { logger } = require('../utils/logger');
 const { authenticate, authenticateApiKey, checkCredits } = require('../middleware/auth');
 const solanaService = require('../services/solanaService');
+const webhookService = require('../utils/webhookService');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -21,22 +22,37 @@ router.post('/payment-link', [
   // Use either API key or JWT authentication
   (req, res, next) => {
     const authHeader = req.header('Authorization');
-    if (!authHeader) {
+    const apiKeyHeader = req.header('X-API-Key');
+    
+    if (!authHeader && !apiKeyHeader) {
       return res.status(401).json({
         success: false,
-        error: 'Authorization header is required'
+        error: 'Authentication required. Provide Authorization Bearer token or X-API-Key header.'
       });
     }
 
-    // Check if it's an API key (UUID format) or JWT token
-    const token = authHeader.replace('Bearer ', '');
+    // If X-API-Key header is present, use API key authentication
+    if (apiKeyHeader) {
+      return authenticateApiKey(req, res, next);
+    }
+
+    // If Authorization header is present, check if it's API key or JWT
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      // Check if it's a UUID format (API key)
     const isApiKey = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token);
     
     if (isApiKey) {
-      authenticateApiKey(req, res, next);
+        return authenticateApiKey(req, res, next);
     } else {
-      authenticate(req, res, next);
+        return authenticate(req, res, next);
+      }
     }
+
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid authentication format'
+    });
   },
   checkCredits(1),
   body('amount')
@@ -60,7 +76,14 @@ router.post('/payment-link', [
         throw new Error('Invalid Solana wallet address');
       }
       return true;
+    }),
+  body('webhookUrl')
+    .optional()
+    .isURL({
+      protocols: ['http', 'https'],
+      require_protocol: true
     })
+    .withMessage('Webhook URL must be a valid HTTP/HTTPS URL')
 ], async (req, res) => {
   try {
     // Check validation errors
@@ -73,7 +96,7 @@ router.post('/payment-link', [
       });
     }
 
-    const { amount, currency = 'SOL', label, message, walletAddress } = req.body;
+    const { amount, currency = 'SOL', label, message, walletAddress, webhookUrl } = req.body;
 
     // Use provided wallet address or user's default wallet address
     const recipientWallet = walletAddress || req.user.walletAddress;
@@ -122,7 +145,8 @@ router.post('/payment-link', [
           solanaPayUrl: paymentRequest.url,
           qrCodeData: paymentRequest.qrCode,
           reference: paymentRequest.reference,
-          createdViaApi: false // Dashboard creation
+          createdViaApi: false, // Dashboard creation
+          webhookUrl
         },
         select: {
           id: true,
@@ -141,6 +165,17 @@ router.post('/payment-link', [
     });
 
     logger.info(`Payment link created by user ${req.user.email}: ${result.id}`);
+
+    // Send webhook notification if webhook URL is provided
+    if (webhookUrl) {
+      try {
+        await webhookService.sendPaymentCreated(webhookUrl, result, req.user);
+        logger.info(`Webhook sent for payment creation: ${result.id}`);
+      } catch (webhookError) {
+        logger.error(`Failed to send webhook for payment ${result.id}:`, webhookError);
+        // Don't fail the payment creation if webhook fails
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -427,6 +462,17 @@ router.post('/payments/:id/verify', [
       });
 
       logger.info(`Payment verified: ${id} with signature: ${signature}`);
+
+      // Send webhook notification if webhook URL is provided
+      if (payment.webhookUrl) {
+        try {
+          await webhookService.sendPaymentCompleted(payment.webhookUrl, updatedPayment, user, verification);
+          logger.info(`Webhook sent for payment completion: ${id}`);
+        } catch (webhookError) {
+          logger.error(`Failed to send webhook for payment ${id}:`, webhookError);
+          // Don't fail the verification if webhook fails
+        }
+      }
 
       res.json({
         success: true,

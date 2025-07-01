@@ -1,7 +1,9 @@
 const express = require('express');
+const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { logger } = require('../utils/logger');
 const { authenticate } = require('../middleware/auth');
+const paymentExpirationService = require('../utils/paymentExpirationService');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -316,6 +318,108 @@ router.get('/recent-activity', authenticate, requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Server error while fetching recent activity'
+    });
+  }
+});
+
+// @route   GET /api/admin/payment-expiration/stats
+// @desc    Get payment expiration statistics
+// @access  Admin only
+router.get('/payment-expiration/stats', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const stats = await paymentExpirationService.getExpirationStats();
+
+    res.json({
+      success: true,
+      data: stats
+    });
+
+  } catch (error) {
+    logger.error('Admin payment expiration stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server error while fetching expiration stats'
+    });
+  }
+});
+
+// @route   POST /api/admin/payment-expiration/run
+// @desc    Manually run payment expiration cleanup
+// @access  Admin only
+router.post('/payment-expiration/run', authenticate, requireAdmin, async (req, res) => {
+  try {
+    logger.info(`Admin ${req.user.email} triggered manual payment expiration cleanup`);
+    const result = await paymentExpirationService.expireOldPayments();
+
+    res.json({
+      success: true,
+      message: 'Payment expiration cleanup completed',
+      data: result
+    });
+
+  } catch (error) {
+    logger.error('Admin manual payment expiration error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server error while running payment expiration'
+    });
+  }
+});
+
+// @route   POST /api/admin/payment-expiration/expire/:id
+// @desc    Manually expire a specific payment
+// @access  Admin only
+router.post('/payment-expiration/expire/:id', [
+  authenticate,
+  requireAdmin,
+  body('reason')
+    .optional()
+    .isLength({ max: 200 })
+    .withMessage('Reason must be less than 200 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: errors.array()
+      });
+    }
+
+    const { id } = req.params;
+    const { reason = `Manual expiration by admin ${req.user.email}` } = req.body;
+
+    const result = await paymentExpirationService.expirePayment(id, reason);
+
+    logger.info(`Admin ${req.user.email} manually expired payment ${id}: ${reason}`);
+
+    res.json({
+      success: true,
+      message: 'Payment expired successfully',
+      data: result
+    });
+
+  } catch (error) {
+    logger.error('Admin manual payment expiration error:', error);
+    
+    if (error.message === 'Payment not found') {
+      return res.status(404).json({
+        success: false,
+        error: 'Payment not found'
+      });
+    }
+
+    if (error.message.includes('not pending')) {
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Server error while expiring payment'
     });
   }
 });

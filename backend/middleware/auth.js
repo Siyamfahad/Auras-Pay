@@ -70,12 +70,25 @@ const authenticate = async (req, res, next) => {
 // API Key Authentication middleware
 const authenticateApiKey = async (req, res, next) => {
   try {
-    const apiKey = req.header('X-API-Key');
+    // Check for API key in both X-API-Key header and Authorization Bearer header
+    let apiKey = req.header('X-API-Key');
+    
+    if (!apiKey) {
+      const authHeader = req.header('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.slice(7);
+        // Check if it's a UUID format (API key)
+        const isApiKey = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token);
+        if (isApiKey) {
+          apiKey = token;
+        }
+      }
+    }
 
     if (!apiKey) {
       return res.status(401).json({
         success: false,
-        error: 'API key is required'
+        error: 'API key is required. Provide it via X-API-Key header or Authorization: Bearer header.'
       });
     }
 
@@ -84,6 +97,7 @@ const authenticateApiKey = async (req, res, next) => {
       select: {
         id: true,
         email: true,
+        walletAddress: true,
         transactionCredits: true,
         status: true
       }

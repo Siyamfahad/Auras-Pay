@@ -124,7 +124,7 @@ export default function AdminPage() {
     return (
       <Layout>
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-          <div className="max-w-4xl mx-auto text-center py-12">
+        <div className="max-w-4xl mx-auto text-center py-12">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4"></div>
             <p className="text-gray-300">Loading admin panel...</p>
           </div>
@@ -137,7 +137,7 @@ export default function AdminPage() {
     return (
       <Layout>
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-          <div className="max-w-4xl mx-auto text-center py-12">
+        <div className="max-w-4xl mx-auto text-center py-12">
             <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
             <p className="text-gray-300 mb-4">You don't have permission to access the admin panel.</p>
@@ -155,273 +155,273 @@ export default function AdminPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
               <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
                   <Shield className="h-8 w-8 text-white" />
                 </div>
                 Admin Dashboard
-              </h1>
+            </h1>
               <p className="text-gray-300 mt-2">Manage users, credits, and view platform analytics</p>
-            </div>
+          </div>
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-gray-700">
               <span className="text-sm text-gray-400">Logged in as: </span>
               <span className="font-medium text-purple-400">{user?.email}</span>
-            </div>
           </div>
+        </div>
 
-          {/* Analytics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
-              <div className="flex items-center">
+            <div className="flex items-center">
                 <div className="p-3 bg-blue-600/20 rounded-lg">
                   <Users className="h-8 w-8 text-blue-400" />
                 </div>
-                <div className="ml-4">
+              <div className="ml-4">
                   <p className="text-sm font-medium text-gray-400">Total Users</p>
                   <p className="text-2xl font-bold text-white">{analytics.totalUsers || 0}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="p-3 bg-green-600/20 rounded-lg">
-                  <CreditCard className="h-8 w-8 text-green-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-400">Total Payments</p>
-                  <p className="text-2xl font-bold text-white">{analytics.totalPayments || 0}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="p-3 bg-purple-600/20 rounded-lg">
-                  <TrendingUp className="h-8 w-8 text-purple-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-400">Credits Issued</p>
-                  <p className="text-2xl font-bold text-white">{analytics.totalCreditsIssued || 0}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
-              <div className="flex items-center">
-                <div className="p-3 bg-yellow-600/20 rounded-lg">
-                  <DollarSign className="h-8 w-8 text-yellow-400" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-400">Total Revenue</p>
-                  <p className="text-2xl font-bold text-white">${analytics.totalRevenue || 0}</p>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Users Management */}
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
+            <div className="flex items-center">
+                <div className="p-3 bg-green-600/20 rounded-lg">
+                  <CreditCard className="h-8 w-8 text-green-400" />
+                </div>
+              <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-400">Total Payments</p>
+                  <p className="text-2xl font-bold text-white">{analytics.totalPayments || 0}</p>
+              </div>
+            </div>
+          </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
+            <div className="flex items-center">
+                <div className="p-3 bg-purple-600/20 rounded-lg">
+                  <TrendingUp className="h-8 w-8 text-purple-400" />
+                </div>
+              <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-400">Credits Issued</p>
+                  <p className="text-2xl font-bold text-white">{analytics.totalCreditsIssued || 0}</p>
+              </div>
+            </div>
+          </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6 hover:bg-gray-800/70 transition-all duration-300">
+            <div className="flex items-center">
+                <div className="p-3 bg-yellow-600/20 rounded-lg">
+                  <DollarSign className="h-8 w-8 text-yellow-400" />
+                </div>
+              <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-400">Total Revenue</p>
+                  <p className="text-2xl font-bold text-white">${analytics.totalRevenue || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Users Management */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
             <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
               <Users className="h-6 w-6 text-purple-400" />
               User Management
             </h2>
-            
-            {/* Search */}
-            <div className="mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search users by email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+          
+          {/* Search */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search users by email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 transition-all duration-300"
-                />
-              </div>
+              />
             </div>
+          </div>
 
-            {/* Users Table */}
-            <div className="overflow-x-auto">
+          {/* Users Table */}
+          <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-700">
                 <thead className="bg-gray-700/50">
-                  <tr>
+                <tr>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      User
-                    </th>
+                    User
+                  </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Wallet
-                    </th>
+                    Wallet
+                  </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Credits
-                    </th>
+                    Credits
+                  </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Payments
-                    </th>
+                    Payments
+                  </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Joined
-                    </th>
+                    Joined
+                  </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
                 <tbody className="bg-gray-800/30 divide-y divide-gray-700">
-                  {users.map((user) => (
+                {users.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-700/30 transition-colors duration-200">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div>
                             <div className="text-sm font-medium text-white flex items-center gap-2">
-                              {user.email}
+                            {user.email}
                               {user.isAdmin && (
                                 <div className="p-1 bg-purple-600/20 rounded">
                                   <Shield className="h-4 w-4 text-purple-400" />
                                 </div>
                               )}
-                            </div>
+                          </div>
                             <div className="text-sm text-gray-400">ID: {user.id}</div>
-                          </div>
                         </div>
-                      </td>
+                      </div>
+                    </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {user.walletAddress ? (
+                      {user.walletAddress ? (
                           <div className="font-mono text-xs bg-gray-700/50 px-2 py-1 rounded">
-                            {user.walletAddress.substring(0, 8)}...{user.walletAddress.substring(user.walletAddress.length - 8)}
-                          </div>
-                        ) : (
+                          {user.walletAddress.substring(0, 8)}...{user.walletAddress.substring(user.walletAddress.length - 8)}
+                        </div>
+                      ) : (
                           <span className="text-gray-500">Not connected</span>
-                        )}
-                      </td>
+                      )}
+                    </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-600/20 text-green-400 border border-green-600/30">
-                          {user.transactionCredits} credits
-                        </span>
-                      </td>
+                        {user.transactionCredits} credits
+                      </span>
+                    </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {user.totalPayments || 0}
-                      </td>
+                      {user.totalPayments || 0}
+                    </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                        {formatDate(user.createdAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        {!user.isAdmin && (
-                          <button
-                            onClick={() => setEditingUser(user)}
+                      {formatDate(user.createdAt)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {!user.isAdmin && (
+                        <button
+                          onClick={() => setEditingUser(user)}
                             className="text-purple-400 hover:text-purple-300 flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-purple-600/20 transition-all duration-200"
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit Credits
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        >
+                          <Edit className="h-4 w-4" />
+                          Edit Credits
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-              {users.length === 0 && (
+            {users.length === 0 && (
                 <div className="text-center py-8 text-gray-400">
-                  No users found
-                </div>
-              )}
-            </div>
+                No users found
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Edit Credits Modal */}
-          {editingUser && (
+        {/* Edit Credits Modal */}
+        {editingUser && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
               <div className="relative p-6 border border-gray-700 w-96 shadow-2xl rounded-xl bg-gray-800 mx-4">
-                <div className="mt-3">
+              <div className="mt-3">
                   <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
                     <Edit className="h-5 w-5 text-purple-400" />
-                    Adjust Credits for {editingUser.email}
-                  </h3>
-                  
+                  Adjust Credits for {editingUser.email}
+                </h3>
+                
                   <div className="mb-4 p-3 bg-gray-700/50 rounded-lg">
                     <p className="text-sm text-gray-300">
                       Current credits: <span className="font-medium text-green-400">{editingUser.transactionCredits}</span>
-                    </p>
-                  </div>
+                  </p>
+                </div>
 
-                  <div className="mb-4">
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Credit Adjustment
-                    </label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setCreditAdjustment('-10')}
-                        className="flex items-center gap-1 px-3 py-2 border border-red-600/30 text-red-400 rounded-md hover:bg-red-600/20 transition-all duration-200"
-                      >
-                        <Minus className="h-4 w-4" /> 10
-                      </button>
-                      <button
-                        onClick={() => setCreditAdjustment('-100')}
-                        className="flex items-center gap-1 px-3 py-2 border border-red-600/30 text-red-400 rounded-md hover:bg-red-600/20 transition-all duration-200"
-                      >
-                        <Minus className="h-4 w-4" /> 100
-                      </button>
-                      <input
-                        type="number"
-                        value={creditAdjustment}
-                        onChange={(e) => setCreditAdjustment(e.target.value)}
-                        placeholder="Enter amount"
-                        className="flex-1 border border-gray-600 rounded-md px-3 py-2 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                      />
-                      <button
-                        onClick={() => setCreditAdjustment('10')}
-                        className="flex items-center gap-1 px-3 py-2 border border-green-600/30 text-green-400 rounded-md hover:bg-green-600/20 transition-all duration-200"
-                      >
-                        <Plus className="h-4 w-4" /> 10
-                      </button>
-                      <button
-                        onClick={() => setCreditAdjustment('100')}
-                        className="flex items-center gap-1 px-3 py-2 border border-green-600/30 text-green-400 rounded-md hover:bg-green-600/20 transition-all duration-200"
-                      >
-                        <Plus className="h-4 w-4" /> 100
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Reason (optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      placeholder="Reason for adjustment"
-                      className="w-full border border-gray-600 rounded-md px-3 py-2 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    />
-                  </div>
-
-                  <div className="flex gap-3">
+                    Credit Adjustment
+                  </label>
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => handleCreditAdjustment(editingUser.id, creditAdjustment)}
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-md hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium"
+                      onClick={() => setCreditAdjustment('-10')}
+                        className="flex items-center gap-1 px-3 py-2 border border-red-600/30 text-red-400 rounded-md hover:bg-red-600/20 transition-all duration-200"
                     >
-                      Apply Changes
+                      <Minus className="h-4 w-4" /> 10
                     </button>
                     <button
-                      onClick={() => {
-                        setEditingUser(null);
-                        setCreditAdjustment('');
-                        setReason('');
-                      }}
-                      className="flex-1 bg-gray-600 text-gray-200 px-4 py-2 rounded-md hover:bg-gray-500 transition-all duration-200"
+                      onClick={() => setCreditAdjustment('-100')}
+                        className="flex items-center gap-1 px-3 py-2 border border-red-600/30 text-red-400 rounded-md hover:bg-red-600/20 transition-all duration-200"
                     >
-                      Cancel
+                      <Minus className="h-4 w-4" /> 100
+                    </button>
+                    <input
+                      type="number"
+                      value={creditAdjustment}
+                      onChange={(e) => setCreditAdjustment(e.target.value)}
+                      placeholder="Enter amount"
+                        className="flex-1 border border-gray-600 rounded-md px-3 py-2 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    />
+                    <button
+                      onClick={() => setCreditAdjustment('10')}
+                        className="flex items-center gap-1 px-3 py-2 border border-green-600/30 text-green-400 rounded-md hover:bg-green-600/20 transition-all duration-200"
+                    >
+                      <Plus className="h-4 w-4" /> 10
+                    </button>
+                    <button
+                      onClick={() => setCreditAdjustment('100')}
+                        className="flex items-center gap-1 px-3 py-2 border border-green-600/30 text-green-400 rounded-md hover:bg-green-600/20 transition-all duration-200"
+                    >
+                      <Plus className="h-4 w-4" /> 100
                     </button>
                   </div>
                 </div>
+
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Reason (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="Reason for adjustment"
+                      className="w-full border border-gray-600 rounded-md px-3 py-2 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleCreditAdjustment(editingUser.id, creditAdjustment)}
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-md hover:from-purple-700 hover:to-blue-700 transition-all duration-200 font-medium"
+                  >
+                    Apply Changes
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingUser(null);
+                      setCreditAdjustment('');
+                      setReason('');
+                    }}
+                      className="flex-1 bg-gray-600 text-gray-200 px-4 py-2 rounded-md hover:bg-gray-500 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
       </div>
     </Layout>

@@ -11,9 +11,11 @@ const adminRoutes = require('./routes/admin');
 const apiRoutes = require('./routes/api');
 const { errorHandler } = require('./middleware/errorHandler');
 const { logger } = require('./utils/logger');
+const { findAvailablePort, saveCurrentPort, updateFrontendEnv } = require('./utils/portDiscovery');
+const paymentExpirationService = require('./utils/paymentExpirationService');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const DEFAULT_PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
@@ -84,11 +86,52 @@ app.use('*', (req, res) => {
 // Global error handler
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`🚀 AURAS Pay Backend Server running on port ${PORT}`);
-  logger.info(`📊 Health check available at http://localhost:${PORT}/health`);
+// Start server with automatic port detection
+async function startServer() {
+  try {
+    const port = await findAvailablePort(DEFAULT_PORT);
+    
+    app.listen(port, () => {
+      // Save the current port for other processes
+      saveCurrentPort(port);
+      
+      logger.info(`🚀 AURAS Pay Backend Server running on port ${port}`);
+      logger.info(`📊 Health check available at http://localhost:${port}/health`);
   logger.info(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+      
+      // Start payment expiration service
+      paymentExpirationService.start();
+      logger.info(`⏰ Payment expiration service started`);
+      
+      if (port !== parseInt(DEFAULT_PORT)) {
+        console.log(`\n⚠️  Port ${DEFAULT_PORT} was busy, server started on port ${port} instead`);
+        updateFrontendEnv(port);
+        console.log(`🔄 Frontend will automatically use the new backend URL\n`);
+      } else {
+        // Still update frontend env to ensure consistency
+        updateFrontendEnv(port);
+      }
+    });
+  } catch (error) {
+    logger.error('❌ Failed to start server:', error.message);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  logger.info('Received SIGINT, shutting down gracefully...');
+  paymentExpirationService.stop();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  logger.info('Received SIGTERM, shutting down gracefully...');
+  paymentExpirationService.stop();
+  process.exit(0);
 });
 
 module.exports = app; 
