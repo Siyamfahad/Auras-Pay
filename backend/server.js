@@ -21,12 +21,21 @@ const DEFAULT_PORT = process.env.PORT || 3001;
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:3000', // Next.js landing page
+  'http://localhost:5173', // React frontend
+  'http://localhost:5174'  // React frontend (Vite default)
+];
+
+// Add allowed origins from environment variable for production
+if (process.env.ALLOWED_ORIGINS) {
+  const additionalOrigins = process.env.ALLOWED_ORIGINS.split(',');
+  allowedOrigins.push(...additionalOrigins);
+}
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:3000', // Next.js landing page
-    'http://localhost:5173'  // React frontend
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -90,14 +99,15 @@ app.use(errorHandler);
 async function startServer() {
   try {
     const port = await findAvailablePort(DEFAULT_PORT);
+    const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
     
-    app.listen(port, () => {
+    app.listen(port, host, () => {
       // Save the current port for other processes
       saveCurrentPort(port);
       
-      logger.info(`🚀 AURAS Pay Backend Server running on port ${port}`);
-      logger.info(`📊 Health check available at http://localhost:${port}/health`);
-  logger.info(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`🚀 AURAS Pay Backend Server running on ${host}:${port}`);
+      logger.info(`📊 Health check available at http://${host === '0.0.0.0' ? 'localhost' : host}:${port}/health`);
+      logger.info(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
       
       // Start payment expiration service
       paymentExpirationService.start();
@@ -110,6 +120,12 @@ async function startServer() {
       } else {
         // Still update frontend env to ensure consistency
         updateFrontendEnv(port);
+      }
+      
+      // Additional info for production
+      if (process.env.NODE_ENV === 'production') {
+        logger.info(`🌐 Server accessible externally on port ${port}`);
+        logger.info(`🔒 Make sure firewall allows connections on port ${port}`);
       }
     });
   } catch (error) {
