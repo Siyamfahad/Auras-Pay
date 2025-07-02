@@ -12,7 +12,7 @@ export default {
     { title: "Pricing", href: "/#faq" },
   ],
   buttons: [
-    { title: "Auras Wallet", href: "http://localhost:3000", type: "secondary" },
+    { title: "Auras Wallet", href: process.env.NEXT_PUBLIC_WALLET_URL || "http://localhost:3000", type: "secondary" },
     { title: "Merchant Login", href: "/login", type: "secondary" },
     { title: "Start Earning", href: "/register", type: "primary" },
   ],

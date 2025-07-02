@@ -4,7 +4,7 @@ const next = require('next');
 const { findAvailablePort, saveCurrentPort } = require('./utils/portDiscovery');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
+const hostname = process.env.HOST || 'localhost';
 const defaultPort = 3002; // Different default port to avoid conflict with landing page
 
 async function startServer() {

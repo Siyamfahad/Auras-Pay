@@ -3,7 +3,7 @@ const { parse } = require('url');
 const next = require('next');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
+const hostname = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3000;
 
 // When using middleware `hostname` and `port` must be provided below

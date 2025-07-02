@@ -123,18 +123,18 @@ JWT_SECRET="$(openssl rand -base64 64)"
 JWT_EXPIRES_IN="7d"
 PORT=3001
 NODE_ENV="production"
-FRONTEND_URL="https://DOMAIN_PLACEHOLDER"
-API_URL="https://DOMAIN_PLACEHOLDER/api"
+FRONTEND_URL="http://0.0.0.0:5174"
+API_URL="http://0.0.0.0:3001"
 SOLANA_NETWORK="mainnet-beta"
 SOLANA_RPC_URL="https://api.mainnet-beta.solana.com"
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
-ALLOWED_ORIGINS="https://DOMAIN_PLACEHOLDER,https://www.DOMAIN_PLACEHOLDER"
+ALLOWED_ORIGINS="http://0.0.0.0:5174,http://0.0.0.0:3000,http://0.0.0.0:3002,http://localhost:5174,http://localhost:3000,http://localhost:3002"
 ENV_FILE
 
 # Frontend environment
 cat > frontend/.env << ENV_FILE
-VITE_API_URL=https://DOMAIN_PLACEHOLDER/api
+VITE_API_URL=http://0.0.0.0:3001
 VITE_APP_NAME="AURAS Pay"
 VITE_APP_VERSION="1.0.0"
 VITE_NODE_ENV=production
@@ -142,7 +142,7 @@ ENV_FILE
 
 # Also create .env.local for immediate use
 cat > frontend/.env.local << ENV_FILE
-VITE_API_URL=https://DOMAIN_PLACEHOLDER/api
+VITE_API_URL=http://0.0.0.0:3001
 ENV_FILE
 
 # Install dependencies

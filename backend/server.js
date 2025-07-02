@@ -23,9 +23,12 @@ app.use(helmet());
 // CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:3000', // Next.js landing page
+  process.env.LANDING_URL || 'http://localhost:3000', // Next.js landing page
   'http://localhost:5173', // React frontend
-  'http://localhost:5174'  // React frontend (Vite default)
+  'http://localhost:5174', // React frontend (Vite default)
+  'http://0.0.0.0:5174',   // Server external access
+  'http://0.0.0.0:3000',   // Landing page external access
+  'http://0.0.0.0:5173'    // Frontend external access
 ];
 
 // Add allowed origins from environment variable for production

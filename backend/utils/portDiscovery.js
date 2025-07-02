@@ -67,12 +67,15 @@ function updateFrontendEnv(port) {
   const frontendEnvPath = path.join(__dirname, '../../frontend/.env');
   const frontendEnvLocalPath = path.join(__dirname, '../../frontend/.env.local');
   
-  const envContent = `VITE_API_URL=http://localhost:${port}\n`;
+  // Use environment-appropriate URL
+  const isProduction = process.env.NODE_ENV === 'production';
+  const host = isProduction ? '0.0.0.0' : 'localhost';
+  const envContent = `VITE_API_URL=http://${host}:${port}\n`;
   
   try {
     // Update .env.local (takes precedence over .env)
     fs.writeFileSync(frontendEnvLocalPath, envContent, 'utf8');
-    console.log(`✅ Updated frontend environment: VITE_API_URL=http://localhost:${port}`);
+    console.log(`✅ Updated frontend environment: VITE_API_URL=http://${host}:${port}`);
   } catch (error) {
     console.error('Failed to update frontend .env:', error.message);
   }
