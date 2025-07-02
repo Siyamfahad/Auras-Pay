@@ -39,6 +39,20 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# Check if /tmp is writable
+if [ ! -w /tmp ]; then
+    print_error "/tmp directory is not writable"
+    exit 1
+fi
+
+# Check required commands
+for cmd in sed chmod chown sudo; do
+    if ! command -v $cmd &> /dev/null; then
+        print_error "Required command '$cmd' not found"
+        exit 1
+    fi
+done
+
 # Get domain from user
 print_header "Domain Configuration"
 read -p "Enter your domain name (e.g., yourdomain.com): " DOMAIN
@@ -106,6 +120,7 @@ chown -R auras:auras "$APP_DIR"
 print_header "Setting up Application as 'auras' user"
 
 # Create setup script for auras user
+print_status "Creating application setup script..."
 cat > /tmp/auras_setup.sh << 'SETUP_SCRIPT'
 #!/bin/bash
 cd /home/auras/auras-pay
@@ -187,13 +202,59 @@ npm run build:all
 echo "Application setup completed!"
 SETUP_SCRIPT
 
+# Set initial permissions on the template script
+chmod 755 /tmp/auras_setup.sh
+
 # Replace domain placeholder and run setup
 sed "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /tmp/auras_setup.sh > /tmp/auras_setup_final.sh
-chmod +x /tmp/auras_setup_final.sh
+
+# Set proper permissions
+chmod 755 /tmp/auras_setup_final.sh
 chown auras:auras /tmp/auras_setup_final.sh
 
+# Verify script exists and is executable
+if [ ! -f /tmp/auras_setup_final.sh ]; then
+    print_error "Setup script was not created properly"
+    exit 1
+fi
+
+if [ ! -x /tmp/auras_setup_final.sh ]; then
+    print_error "Setup script is not executable"
+    exit 1
+fi
+
 # Run setup as auras user
-sudo -u auras /tmp/auras_setup_final.sh
+print_status "Running application setup as 'auras' user..."
+print_status "Script path: /tmp/auras_setup_final.sh"
+print_status "Script permissions: $(ls -la /tmp/auras_setup_final.sh)"
+print_status "Script owner: $(stat -c '%U:%G' /tmp/auras_setup_final.sh 2>/dev/null || stat -f '%Su:%Sg' /tmp/auras_setup_final.sh 2>/dev/null || echo 'unknown')"
+
+# Test script execution
+if sudo -u auras test -x /tmp/auras_setup_final.sh; then
+    print_status "Script is executable by auras user"
+else
+    print_error "Script is not executable by auras user"
+    exit 1
+fi
+
+# Try to execute the script with error handling
+if ! sudo -u auras bash /tmp/auras_setup_final.sh; then
+    print_error "Setup script failed to execute. Trying alternative method..."
+    
+    # Copy script to auras home directory as fallback
+    cp /tmp/auras_setup_final.sh /home/auras/setup.sh
+    chown auras:auras /home/auras/setup.sh
+    chmod 755 /home/auras/setup.sh
+    
+    print_status "Trying alternative execution method..."
+    if ! sudo -u auras /home/auras/setup.sh; then
+        print_error "Both execution methods failed. Please check the logs above."
+        exit 1
+    fi
+    
+    # Clean up
+    rm -f /home/auras/setup.sh
+fi
 
 # Setup PM2 ecosystem
 print_header "Setting up PM2"
