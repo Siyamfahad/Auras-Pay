@@ -1,0 +1,107 @@
+#!/bin/bash
+echo "🔧 Creating Prisma fix for Ubuntu..."
+
+# This script fixes the Prisma platform issue and focuses on getting the app running
+
+cat > prisma-fix-commands.txt << 'COMMANDS'
+# Run these commands on your Ubuntu server:
+
+# 1. Stop all PM2 processes
+pm2 delete all
+
+# 2. Fix Prisma by reinstalling (in backend directory)
+cd backend
+rm -rf node_modules/.prisma
+rm -rf node_modules/@prisma
+npm install @prisma/client
+npx prisma generate
+
+# 3. If Prisma still fails, skip database for now and use SQLite fallback
+# Your app was already running, so we can bypass this temporarily
+
+cd ..
+
+# 4. Fix the main issue - the ecosystem config
+cat > ecosystem.config.js << 'ECOSYSTEM_EOF'
+module.exports = {
+  apps: [
+    {
+      name: 'auras-backend',
+      script: './server.js',
+      cwd: './backend',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+        HOST: '0.0.0.0'
+      },
+      error_file: '../logs/backend-error.log',
+      out_file: '../logs/backend-out.log',
+      log_file: '../logs/backend-combined.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 10
+    },
+    {
+      name: 'auras-frontend',
+      script: 'serve',
+      args: ['-s', 'dist', '-l', '5174'],
+      cwd: './frontend',
+      instances: 1,
+      exec_mode: 'fork',
+      env: { NODE_ENV: 'production' },
+      error_file: '../logs/frontend-error.log',
+      out_file: '../logs/frontend-out.log',
+      log_file: '../logs/frontend-combined.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 10
+    },
+    {
+      name: 'auras-landing',
+      script: './server.js',
+      cwd: './landingpage',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3002,
+        HOST: '0.0.0.0'
+      },
+      error_file: '../logs/landing-error.log',
+      out_file: '../logs/landing-out.log',
+      log_file: '../logs/landing-combined.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 10
+    }
+  ]
+};
+ECOSYSTEM_EOF
+
+# 5. Install serve globally if needed
+npm install -g serve
+
+# 6. Start services
+pm2 start ecosystem.config.js
+pm2 save
+
+# 7. Check status
+pm2 status
+
+# 8. Test the services
+echo ""
+echo "Testing services..."
+curl -s http://localhost:3001/health || echo "Backend not responding"
+curl -s http://localhost:3002 | head -1 || echo "Landing page not responding"  
+curl -s http://localhost:5174 | head -1 || echo "Frontend not responding"
+
+echo ""
+echo "If all services show 'online' in pm2 status, your app is working!"
+COMMANDS
+
+echo "Created: prisma-fix-commands.txt"
+echo ""
+echo "📋 Copy and paste these commands on your Ubuntu server:"
+cat prisma-fix-commands.txt

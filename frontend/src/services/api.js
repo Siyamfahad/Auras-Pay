@@ -1,23 +1,6 @@
 import axios from 'axios';
 
-// Dynamic API URL detection
-const getApiUrl = () => {
-  // First check environment variable
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-  
-  // If in browser, try to use current host with API port
-  if (typeof window !== 'undefined') {
-    const currentHost = window.location.hostname;
-    return `http://${currentHost}:3001`;
-  }
-  
-  // Fallback to localhost
-  return 'http://localhost:3001';
-};
-
-const API_URL = getApiUrl();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Create axios instance
 const api = axios.create({
