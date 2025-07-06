@@ -35,5 +35,8 @@
     "walletPage"
   ],
   "author": "AURAS Pay Team",
-  "license": "MIT"
-} 
+  "license": "MIT",
+  "dependencies": {
+    "all": "^0.0.0"
+  }
+}

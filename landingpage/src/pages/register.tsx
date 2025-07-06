@@ -10,7 +10,8 @@ export default function RegisterPage() {
     // Auto-redirect to the dashboard after 3 seconds
     const timer = setTimeout(() => {
       setIsRedirecting(true);
-      window.location.href = 'http://91.99.185.144:5174/register';
+      const currentHost = window.location.hostname;
+      window.location.href = `http://${currentHost}:5174/register`;
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -18,7 +19,8 @@ export default function RegisterPage() {
 
   const handleRedirectNow = () => {
     setIsRedirecting(true);
-    window.location.href = 'http://91.99.185.144:5174/register';
+    const currentHost = window.location.hostname;
+    window.location.href = `http://${currentHost}:5174/register`;
   };
 
   return (

@@ -25,13 +25,13 @@ module.exports = {
     },
     {
       name: 'auras-frontend',
-      script: 'serve',
-      args: '-s dist -l 5174 -n',
+      script: 'npm',
+      args: 'run dev',
       cwd: './frontend',
       instances: 1,
       exec_mode: 'fork',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'development'
       },
       error_file: './logs/frontend-error.log',
       out_file: './logs/frontend-out.log',
@@ -80,4 +80,4 @@ module.exports = {
       max_restarts: 10
     }
   ]
-}; 
+};

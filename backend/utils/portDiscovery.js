@@ -67,12 +67,27 @@ function updateFrontendEnv(port) {
   const frontendEnvPath = path.join(__dirname, '../../frontend/.env');
   const frontendEnvLocalPath = path.join(__dirname, '../../frontend/.env.local');
   
-  const envContent = `VITE_API_URL=http://91.99.185.144:${port}\n`;
+  // Get the current server IP dynamically
+const os = require('os');
+const getServerIP = () => {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const interface of interfaces[name]) {
+      if (interface.family === 'IPv4' && !interface.internal) {
+        return interface.address;
+      }
+    }
+  }
+  return 'localhost'; // fallback
+};
+
+const serverIP = getServerIP();
+const envContent = `VITE_API_URL=http://${serverIP}:${port}\n`;
   
   try {
     // Update .env.local (takes precedence over .env)
     fs.writeFileSync(frontendEnvLocalPath, envContent, 'utf8');
-    console.log(`✅ Updated frontend environment: VITE_API_URL=http://91.99.185.144:${port}`);
+    console.log(`✅ Updated frontend environment: VITE_API_URL=http://${serverIP}:${port}`);
   } catch (error) {
     console.error('Failed to update frontend .env:', error.message);
   }

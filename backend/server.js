@@ -33,10 +33,10 @@ const allowedOrigins = [
   'http://localhost:3000', // Next.js landing page
   'http://localhost:5173', // React frontend
   'http://localhost:5174', // React frontend (Vite default)
-  'http://91.99.185.144:3000', // Server wallet page
-  'http://91.99.185.144:5174', // Server frontend
-  'http://91.99.185.144:3002', // Server landing page
-  'http://91.99.185.144'       // Server root
+  'http://0.0.0.0:3000', // Server wallet page
+  'http://0.0.0.0:5174', // Server frontend
+  'http://0.0.0.0:3002', // Server landing page
+  'http://0.0.0.0'       // Server root
 ];
 
 // Add allowed origins from environment variable for production
@@ -152,8 +152,8 @@ async function startServer() {
       saveCurrentPort(port);
       
       logger.info(`🚀 AURAS Pay Backend Server running on ${host}:${port}`);
-      logger.info(`📊 Health check available at http://${host === '0.0.0.0' ? '91.99.185.144' : host}:${port}/health`);
-      logger.info(`🧪 Test API available at http://${host === '0.0.0.0' ? '91.99.185.144' : host}:${port}/api/test`);
+      logger.info(`📊 Health check available at http://${host === '0.0.0.0' ? '0.0.0.0' : host}:${port}/health`);
+      logger.info(`🧪 Test API available at http://${host === '0.0.0.0' ? '0.0.0.0' : host}:${port}/api/test`);
       logger.info(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
       
       // Start payment expiration service
@@ -177,9 +177,9 @@ async function startServer() {
       if (process.env.NODE_ENV === 'production') {
         logger.info(`🌐 Server accessible externally on port ${port}`);
         logger.info(`🔒 Make sure firewall allows connections on port ${port}`);
-        console.log(`\n✅ Backend server ready at http://91.99.185.144:${port}`);
-        console.log(`✅ Health check: http://91.99.185.144:${port}/health`);
-        console.log(`✅ Test API: http://91.99.185.144:${port}/api/test\n`);
+        console.log(`\n✅ Backend server ready at http://0.0.0.0:${port}`);
+        console.log(`✅ Health check: http://0.0.0.0:${port}/health`);
+        console.log(`✅ Test API: http://0.0.0.0:${port}/api/test\n`);
       }
     });
 

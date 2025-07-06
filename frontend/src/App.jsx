@@ -28,14 +28,17 @@ const queryClient = new QueryClient({
 // Landing page redirect component
 const LandingPageRedirect = () => {
   useEffect(() => {
-    window.location.replace('/index.html');
+    // Redirect to the Next.js landing page using current hostname
+    const currentHost = window.location.hostname;
+    const landingPort = '3000';
+    window.location.replace(`http://${currentHost}:${landingPort}`);
   }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading landing page...</p>
+        <p className="mt-4 text-gray-600">Redirecting to landing page...</p>
       </div>
     </div>
   );

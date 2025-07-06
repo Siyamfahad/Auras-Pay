@@ -12,6 +12,7 @@ import {
   Sparkles,
   Book,
 } from 'lucide-react';
+import paylogo from '../assets/paylogo.svg';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -52,7 +53,7 @@ export default function Layout({ children }) {
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <div className="flex-shrink-0 flex justify-center px-4 mb-8">
               <img 
-                src="/paylogo.svg" 
+                src={paylogo}
                 alt="AURAS Pay" 
                 className="h-16 w-auto"
               />
@@ -104,7 +105,7 @@ export default function Layout({ children }) {
           <div className="flex-1 flex flex-col pt-6 pb-4 overflow-y-auto">
             <div className="flex justify-center flex-shrink-0 px-4 mb-8">
               <img 
-                src="/paylogo.svg" 
+                src={paylogo}
                 alt="AURAS Pay" 
                 className="h-16 w-auto"
               />
@@ -181,4 +182,4 @@ export default function Layout({ children }) {
       </div>
     </div>
   );
-} 
+}

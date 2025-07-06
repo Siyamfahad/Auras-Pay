@@ -51,8 +51,8 @@ export default defineConfig(async () => {
       }
     ],
   server: {
-      port: port,
-    host: true,
+    port: port,
+    host: '0.0.0.0',
   },
   build: {
     outDir: 'dist',
@@ -61,7 +61,7 @@ export default defineConfig(async () => {
   publicDir: 'public',
     preview: {
       port: port + 1000, // Use a different port for preview to avoid conflicts
-      host: true,
+      host: '0.0.0.0',
     }
   };
 })

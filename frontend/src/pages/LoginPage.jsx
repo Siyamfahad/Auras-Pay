@@ -6,6 +6,7 @@ import * as yup from 'yup';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, Sparkles } from 'lucide-react';
+import paylogo from '../assets/paylogo.svg';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -69,7 +70,7 @@ export default function LoginPage() {
           <div className="text-center">
             <div className="flex justify-center mb-6">
               <img 
-                src="/paylogo.svg" 
+                src={paylogo}
                 alt="AURAS Pay" 
                 className="h-16 w-auto"
               />
@@ -187,4 +188,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-} 
+}
